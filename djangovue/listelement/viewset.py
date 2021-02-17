@@ -3,13 +3,21 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
 from .models import Element, Category, Type
-from .serializer import ElementSerializer, CategorySerializer, TypeSerializer
+from .serializer import ElementSerializer, CategorySerializer, TypeSerializer, CommentSerializer
+
+from comment.models import Comment
 
 class ElementViewSet(viewsets.ModelViewSet):
     queryset = Element.objects.all()
     serializer_class = ElementSerializer
 
-class CategoryViewSet(viewsets.ModelViewSet):
+    @action(detail=False, methods=['get'])
+    def all(self, request):
+        queryset = Element.objects.all()
+        serializer = ElementSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
@@ -18,6 +26,12 @@ class CategoryViewSet(viewsets.ModelViewSet):
     def elements(self, request, pk=None):
         queryset = Element.objects.filter(category_id=pk)
         serializer = ElementSerializer(queryset, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'])
+    def all(self, request):
+        queryset = Category.objects.all()
+        serializer = CategorySerializer(queryset, many=True)
         return Response(serializer.data)
 
     def list(self, request):
@@ -32,7 +46,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-class TypeViewSet(viewsets.ModelViewSet):
+class TypeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Type.objects.all()
     serializer_class = TypeSerializer
 
@@ -41,4 +55,21 @@ class TypeViewSet(viewsets.ModelViewSet):
     def elements(self, request, pk=None):
         queryset = Element.objects.filter(type_id=pk)
         serializer = TypeSerializer(queryset, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'])
+    def all(self, request):
+        queryset = Type.objects.all()
+        serializer = TypeSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    queryset = Comment.objects.exclude(element__isnull=True)
+    serializer_class = CommentSerializer
+
+    @action(detail=False, methods=['get'])
+    def all(self, request):
+        queryset = Comment.objects.all()
+        serializer = CommentSerializer(queryset, many=True)
         return Response(serializer.data)
