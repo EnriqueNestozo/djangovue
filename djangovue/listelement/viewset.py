@@ -17,6 +17,13 @@ class ElementViewSet(viewsets.ModelViewSet):
         serializer = ElementSerializer(queryset, many=True)
         return Response(serializer.data)
 
+    @action(detail=False, methods=['get'])
+    def url(self, request):
+        # queryset = Element.objects.get(clean_url=request.query_params['clean_url'])
+        queryset = get_object_or_404(Element,clean_url=request.query_params['clean_url'])
+        serializer = ElementSerializer(queryset, many=False)
+        return Response(serializer.data)
+
 class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
@@ -33,17 +40,23 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
         queryset = Category.objects.all()
         serializer = CategorySerializer(queryset, many=True)
         return Response(serializer.data)
-
-    def list(self, request):
-        queryset = Category.objects.all()
-        serializer = CategorySerializer(queryset, many=True)
+    
+    @action(detail=False, methods=['get'])
+    def url(self, request):
+        queryset = get_object_or_404(Category,clean_url=request.query_params['clean_url'])
+        serializer = CategorySerializer(queryset, many=False)
         return Response(serializer.data)
 
-    def retrieve(self, request, pk=None):
-        queryset = Category.objects.all()
-        category = get_object_or_404(queryset, pk=pk)
-        serializer = CategorySerializer(category)
-        return Response(serializer.data)
+    # def list(self, request):
+    #     queryset = Category.objects.all()
+    #     serializer = CategorySerializer(queryset, many=True)
+    #     return Response(serializer.data)
+
+    # def retrieve(self, request, pk=None):
+    #     queryset = Category.objects.all()
+    #     category = get_object_or_404(queryset, pk=pk)
+    #     serializer = CategorySerializer(category)
+    #     return Response(serializer.data)
 
 
 class TypeViewSet(viewsets.ReadOnlyModelViewSet):
@@ -61,6 +74,12 @@ class TypeViewSet(viewsets.ReadOnlyModelViewSet):
     def all(self, request):
         queryset = Type.objects.all()
         serializer = TypeSerializer(queryset, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'])
+    def url(self, request):
+        queryset = get_object_or_404(Type,clean_url=request.query_params['clean_url'])
+        serializer = TypeSerializer(queryset, many=False)
         return Response(serializer.data)
 
 
